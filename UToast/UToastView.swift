@@ -18,16 +18,24 @@ public enum UToastViewType {
 open class UToastView: UIView {
     public var label: UILabel!
     public var insets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+    public var offsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
     public var originY: CGFloat = 0
     public var distance: CGFloat = 24
     public var interval: TimeInterval = 0.2
     public var duration: TimeInterval = 2
     public var colors: [UToastViewType: (background: UIColor, text: UIColor)] = [
-        .info: (UIColor(red: 230/255, green: 247/255, blue: 255/255, alpha: 1), UIColor(red: 24/255, green: 144/255, blue: 255/255, alpha: 1)),
-        .success: (UIColor(red: 246/255, green: 255/255, blue: 237/255, alpha: 1), UIColor(red: 82/255, green: 196/255, blue: 26/255, alpha: 1)),
-        .warn: (UIColor(red: 255/255, green: 251/255, blue: 230/255, alpha: 1), UIColor(red: 250/255, green: 173/255, blue: 20/255, alpha: 1)),
-        .error: (UIColor(red: 255/255, green: 241/255, blue: 240/255, alpha: 1), UIColor(red: 245/255, green: 34/255, blue: 45/255, alpha: 1))
+        .info: (UIColor(red: 24/255, green: 144/255, blue: 255/255, alpha: 1), .white),
+        .success: (UIColor(red: 82/255, green: 196/255, blue: 26/255, alpha: 1), .white),
+        .warn: (UIColor(red: 250/255, green: 173/255, blue: 20/255, alpha: 1), .white),
+        .error: (UIColor(red: 245/255, green: 34/255, blue: 45/255, alpha: 1), .white)
     ]
+    
+//    public var colors: [UToastViewType: (background: UIColor, text: UIColor)] = [
+//        .info: (UIColor(red: 230/255, green: 247/255, blue: 255/255, alpha: 1), UIColor(red: 24/255, green: 144/255, blue: 255/255, alpha: 1)),
+//        .success: (UIColor(red: 246/255, green: 255/255, blue: 237/255, alpha: 1), UIColor(red: 82/255, green: 196/255, blue: 26/255, alpha: 1)),
+//        .warn: (UIColor(red: 255/255, green: 251/255, blue: 230/255, alpha: 1), UIColor(red: 250/255, green: 173/255, blue: 20/255, alpha: 1)),
+//        .error: (UIColor(red: 255/255, green: 241/255, blue: 240/255, alpha: 1), UIColor(red: 245/255, green: 34/255, blue: 45/255, alpha: 1))
+//    ]
     
     public override init(frame: CGRect) {
         let height = frame.height == 0 ? 36 : frame.height
@@ -58,8 +66,13 @@ open class UToastView: UIView {
     }
     
     public func render(message: String, type: UToastViewType = .info, duration: TimeInterval? = nil) {
-        let width = UToastView.getTextWidth(text: message, font: label.font) + insets.left + insets.right
-        frame = CGRect(x: (superview!.frame.width - width) / 2, y: originY, width: width, height: frame.height)
+        guard let wrap = superview else {
+            return
+        }
+        
+        var width = UToastView.getTextWidth(text: message, font: label.font) + insets.left + insets.right
+        width = min(wrap.frame.width - offsets.left - offsets.right, width)
+        frame = CGRect(x: (wrap.frame.width - width) / 2, y: originY, width: width, height: frame.height)
         
         backgroundColor = colors[type]?.background
         label.textColor = colors[type]?.text

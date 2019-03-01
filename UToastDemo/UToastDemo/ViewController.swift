@@ -27,7 +27,7 @@ class ViewController: UIViewController {
     }
     
     @objc func handle() {
-        view.utoast(message: "This is a toast message.", y: 88)
+        view.utoast(message: "This is a toast message. Longgggggggggggggggggggggggg", y: 88)
     }
     
     @objc func handleError() {
